@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="span6 offset3">
+    <%= form_for(@relation) do |f| %>
+        <% if @relation.errors.any? %>
+            <div id="error_explanation">
+              <h2><%= pluralize(@relation.errors.count, "error") %> prohibited this relation from being saved:</h2>
+
+              <ul>
+                <% @relation.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+        <% end %>
+
+        <div class="field selectbox">
+          <%= f.label 'Select Job' %>
+          <%= f.collection_select :job_id, Job.all, :id, :name %><br />
+        </div>
+        <div class="field selectbox">
+          <%= f.label 'Select Successor' %>
+          <%= f.collection_select :successor_id, Job.all, :id, :name %><br />
+        </div>
+
+        <div class="actions">
+          <%= f.submit 'Save Relation' %>
+        </div>
+    <% end %>
+  </div>
+</div>

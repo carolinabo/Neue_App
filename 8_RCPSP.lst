@@ -1,0 +1,461 @@
+GAMS 24.1.3  r41464 Released Jul 26, 2013 WEX-WEI x86_64/MS Windows 03/15/14 23:50:44 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+   1  * Beispiel RCPSP aus dem Buch von Günther/Tempelmeier
+   2   
+   3  set
+   4      j Vorgang
+   5      t Periode
+   6      r Ressource;
+   7   
+   8  alias(t,q);
+   9  alias(h,j);
+  10   
+  11  set
+  12      VN(h,j)    Vorgänger-Nachfolger-Relation zwischen h und j;
+  13   
+  14  parameter
+  15      d(j)    Dauer
+  16      FEZ(j)  Frühester Endzeitpunkt
+  17      SEZ(j)  Spätester Endzeitpunkt
+  18      k(j,r)  Kapazitätsbedarf von Vorgang j auf Ressource r je Periode
+  19      KP(r)   Kapazität je Periode von Ressource r;
+  20   
+  21  binary variables
+  22      x(j,t)  gleich 1 wenn Vorgang j in Periode t beendet wird und 0 sonst;
+  23   
+  24  free variables
+  25      z       Zielfunktionswert;
+  26   
+  27   
+  28  set r /Mitarbeiter1/;
+  29   
+  30  set j / Q, A1, A2, A3, B1, B2, B3, S/;
+  31   
+  32  set t /t0*t20/;
+  33   
+  34   
+  35  VN(h,j)=no;
+  36   
+  37  VN('Q','A1')=yes;
+  38  VN('Q','A2')=yes;
+  39  VN('Q','B1')=yes;
+  40  VN('Q','B2')=yes;
+  41   
+  42  VN('A1','A3')=yes;
+  43  VN('A2','A3')=yes;
+  44  VN('B1','B3')=yes;
+  45  VN('B2','B3')=yes;
+  46   
+  47  VN('A3','S')=yes;
+  48  VN('B3','S')=yes;
+  49   
+  50  parameter
+  51          d(j) /
+  52          Q       0
+  53          A1      3
+  54          A2      9
+  55          A3      4
+  56          B1      7
+  57          B2      6
+  58          B3      5
+  59          S       0
+  60          /
+  61   
+  62          FEZ(j) /
+  63          Q       0
+  64          A1      3
+  65          A2      9
+  66          A3      13
+  67          B1      7
+  68          B2      6
+  69          B3      12
+  70          S       13
+  71          /
+  72   
+  73          SEZ(j) /
+  74          Q       0
+  75          A1      9
+  76          A2      9
+  77          A3      13
+  78          B1      8
+  79          B2      8
+  80          B3      13
+  81          S       13
+  82          /
+  83  ;
+  84   
+  85  k(j,r)=0;
+  86   
+  87  k('A1','Mitarbeiter1')=1;
+  88  k('B2','Mitarbeiter1')=1;
+  89  k('B3','Mitarbeiter1')=1;
+  90   
+  91  KP('Mitarbeiter1')=1;
+  92   
+  93   
+  94   
+  95  Equations
+  96      Zielfunktion
+  97      JederVorgangEinmal(j)
+  98      Projektstruktur(h,j)
+  99      Kapazitaetsrestriktion(r,t);
+ 100   
+ 101  Zielfunktion..
+ 102      z=e=sum(j$(ord(j)=card(J)),sum(t$(FEZ(j)<=ord(t)-1 and ord(t)-1 <= SEZ
+      (j)), (ord(t)-1)*x(j,t)));
+ 103   
+ 104  JederVorgangEinmal(j)..
+ 105      sum(t$(FEZ(j)<=ord(t)-1 and ord(t)-1 <= SEZ(j)), x(j,t)) =e= 1;
+ 106   
+ 107  Projektstruktur(h,j)$VN(h,j)..
+ 108      sum(t$(FEZ(h)<=ord(t)-1 and ord(t)-1 <= SEZ(h)), (ord(t)-1)*x(h,t))  =
+      l=
+ 109      sum(t$(FEZ(j)<=ord(t)-1 and ord(t)-1 <= SEZ(j)), (ord(t)-1-d(j))*x(j,t
+      ));
+ 110   
+ 111  Kapazitaetsrestriktion(r,t)..
+ 112      sum(j,k(j,r)*sum(q$(ord(q)-1>=ord(t)-1 and ord(q)-1<=ord(t)-1+d(j)-1),
+      x(j,q)))=l=KP(r);
+ 113   
+ 114  model RCPSP /
+ 115      Zielfunktion
+ 116      JederVorgangEinmal
+ 117      Projektstruktur
+ 118      Kapazitaetsrestriktion
+ 119      /;
+ 120   
+ 121  *Liefertermin muss verschoben werden, sonst keine zulässige Lösung
+ 122  SEZ(j)=SEZ(j)+1;
+ 123   
+ 124  solve RCPSP minimizing z using mip;
+ 125  display x.l;
+ 126   
+ 127   
+
+
+COMPILATION TIME     =        0.000 SECONDS      3 MB  24.1.3 r41464 WEX-WEI
+GAMS 24.1.3  r41464 Released Jul 26, 2013 WEX-WEI x86_64/MS Windows 03/15/14 23:50:44 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Equation Listing    SOLVE RCPSP Using MIP From line 124
+
+
+---- Zielfunktion  =E=  
+
+Zielfunktion..  - 13*x(S,t13) - 14*x(S,t14) + z =E= 0 ; (LHS = 0)
+     
+
+---- JederVorgangEinmal  =E=  
+
+JederVorgangEinmal(Q)..  x(Q,t0) + x(Q,t1) =E= 1 ; (LHS = 0, INFES = 1 ****)
+     
+JederVorgangEinmal(A1)..  x(A1,t3) + x(A1,t4) + x(A1,t5) + x(A1,t6) + x(A1,t7)
+     
+      + x(A1,t8) + x(A1,t9) + x(A1,t10) =E= 1 ; (LHS = 0, INFES = 1 ****)
+     
+JederVorgangEinmal(A2)..  x(A2,t9) + x(A2,t10) =E= 1 ; (LHS = 0, INFES = 1 ****)
+     
+REMAINING 5 ENTRIES SKIPPED
+
+
+---- Projektstruktur  =L=  
+
+Projektstruktur(Q,A1)..  x(Q,t1) - x(A1,t4) - 2*x(A1,t5) - 3*x(A1,t6)
+     
+      - 4*x(A1,t7) - 5*x(A1,t8) - 6*x(A1,t9) - 7*x(A1,t10) =L= 0 ; (LHS = 0)
+     
+Projektstruktur(Q,A2)..  x(Q,t1) - x(A2,t10) =L= 0 ; (LHS = 0)
+     
+Projektstruktur(Q,B1)..  x(Q,t1) - x(B1,t8) - 2*x(B1,t9) =L= 0 ; (LHS = 0)
+     
+REMAINING 7 ENTRIES SKIPPED
+
+
+---- Kapazitaetsrestriktion  =L=  
+
+Kapazitaetsrestriktion(Mitarbeiter1,t0)..  x(A1,t0) + x(A1,t1) + x(A1,t2)
+     
+      + x(B2,t0) + x(B2,t1) + x(B2,t2) + x(B2,t3) + x(B2,t4) + x(B2,t5)
+     
+      + x(B3,t0) + x(B3,t1) + x(B3,t2) + x(B3,t3) + x(B3,t4) =L= 1 ; (LHS = 0)
+     
+Kapazitaetsrestriktion(Mitarbeiter1,t1)..  x(A1,t1) + x(A1,t2) + x(A1,t3)
+     
+      + x(B2,t1) + x(B2,t2) + x(B2,t3) + x(B2,t4) + x(B2,t5) + x(B2,t6)
+     
+      + x(B3,t1) + x(B3,t2) + x(B3,t3) + x(B3,t4) + x(B3,t5) =L= 1 ; (LHS = 0)
+     
+Kapazitaetsrestriktion(Mitarbeiter1,t2)..  x(A1,t2) + x(A1,t3) + x(A1,t4)
+     
+      + x(B2,t2) + x(B2,t3) + x(B2,t4) + x(B2,t5) + x(B2,t6) + x(B2,t7)
+     
+      + x(B3,t2) + x(B3,t3) + x(B3,t4) + x(B3,t5) + x(B3,t6) =L= 1 ; (LHS = 0)
+     
+REMAINING 18 ENTRIES SKIPPED
+
+GAMS 24.1.3  r41464 Released Jul 26, 2013 WEX-WEI x86_64/MS Windows 03/15/14 23:50:44 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Column Listing      SOLVE RCPSP Using MIP From line 124
+
+
+---- x  gleich 1 wenn Vorgang j in Periode t beendet wird und 0 sonst
+
+x(Q,t0)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+        1       JederVorgangEinmal(Q)
+
+x(Q,t1)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+        1       JederVorgangEinmal(Q)
+        1       Projektstruktur(Q,A1)
+        1       Projektstruktur(Q,A2)
+        1       Projektstruktur(Q,B1)
+        1       Projektstruktur(Q,B2)
+
+x(A1,t0)
+                (.LO, .L, .UP, .M = 0, 0, 1, 0)
+        1       Kapazitaetsrestriktion(Mitarbeiter1,t0)
+
+REMAINING 71 ENTRIES SKIPPED
+
+---- z  Zielfunktionswert
+
+z
+                (.LO, .L, .UP, .M = -INF, 0, +INF, 0)
+        1       Zielfunktion
+
+GAMS 24.1.3  r41464 Released Jul 26, 2013 WEX-WEI x86_64/MS Windows 03/15/14 23:50:44 Page 4
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Model Statistics    SOLVE RCPSP Using MIP From line 124
+
+
+MODEL STATISTICS
+
+BLOCKS OF EQUATIONS           4     SINGLE EQUATIONS           40
+BLOCKS OF VARIABLES           2     SINGLE VARIABLES           75
+NON ZERO ELEMENTS           348     DISCRETE VARIABLES         74
+
+
+GENERATION TIME      =        0.016 SECONDS      4 MB  24.1.3 r41464 WEX-WEI
+
+
+EXECUTION TIME       =        0.016 SECONDS      4 MB  24.1.3 r41464 WEX-WEI
+GAMS 24.1.3  r41464 Released Jul 26, 2013 WEX-WEI x86_64/MS Windows 03/15/14 23:50:44 Page 5
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Solution Report     SOLVE RCPSP Using MIP From line 124
+
+
+               S O L V E      S U M M A R Y
+
+     MODEL   RCPSP               OBJECTIVE  z
+     TYPE    MIP                 DIRECTION  MINIMIZE
+     SOLVER  CPLEX               FROM LINE  124
+
+**** SOLVER STATUS     1 Normal Completion         
+**** MODEL STATUS      1 Optimal                   
+**** OBJECTIVE VALUE               14.0000
+
+ RESOURCE USAGE, LIMIT          0.078      1000.000
+ ITERATION COUNT, LIMIT         0    2000000000
+
+IBM ILOG CPLEX   24.1.3 r41464 Released Jul 26, 2013 WEI x86_64/MS Windows    
+--- GAMS/Cplex licensed for continuous and discrete problems.
+Cplex 12.5.1.0
+
+MIP status(101): integer optimal solution
+Cplex Time: 0.00sec (det. 0.20 ticks)
+Fixing integer variables, and solving final LP...
+Fixed MIP status(1): optimal
+Cplex Time: 0.00sec (det. 0.05 ticks)
+Proven optimal solution.
+
+MIP Solution:           14.000000    (0 iterations, 0 nodes)
+Final Solve:            14.000000    (0 iterations)
+
+Best possible:          14.000000
+Absolute gap:            0.000000
+Relative gap:            0.000000
+
+
+                       LOWER     LEVEL     UPPER    MARGINAL
+
+---- EQU Zielfunkt~      .         .         .        1.000      
+
+---- EQU JederVorgangEinmal  
+
+      LOWER     LEVEL     UPPER    MARGINAL
+
+Q      1.000     1.000     1.000      .         
+A1     1.000     1.000     1.000      .         
+A2     1.000     1.000     1.000      .         
+A3     1.000     1.000     1.000      .         
+B1     1.000     1.000     1.000      .         
+B2     1.000     1.000     1.000      .         
+B3     1.000     1.000     1.000      .         
+S      1.000     1.000     1.000      .         
+
+---- EQU Projektstruktur  
+
+         LOWER     LEVEL     UPPER    MARGINAL
+
+Q .A1     -INF     -6.000      .         .         
+Q .A2     -INF       .         .         .         
+Q .B1     -INF       .         .         .         
+Q .B2     -INF       .         .         .         
+A1.A3     -INF     -1.000      .         .         
+A2.A3     -INF     -1.000      .         .         
+A3.S      -INF       .         .         .         
+B1.B3     -INF     -2.000      .         .         
+B2.B3     -INF     -3.000      .         .         
+B3.S      -INF       .         .         .         
+
+---- EQU Kapazitaetsrestriktion  
+
+                    LOWER     LEVEL     UPPER    MARGINAL
+
+Mitarbeiter1.t0      -INF       .        1.000      .         
+Mitarbeiter1.t1      -INF      1.000     1.000      .         
+Mitarbeiter1.t2      -INF      1.000     1.000      .         
+Mitarbeiter1.t3      -INF      1.000     1.000      .         
+Mitarbeiter1.t4      -INF      1.000     1.000      .         
+Mitarbeiter1.t5      -INF      1.000     1.000      .         
+Mitarbeiter1.t6      -INF      1.000     1.000      .         
+Mitarbeiter1.t7      -INF      1.000     1.000      .         
+Mitarbeiter1.t8      -INF      1.000     1.000      .         
+Mitarbeiter1.t9      -INF      1.000     1.000      .         
+Mitarbeiter1.t10     -INF      1.000     1.000      .         
+Mitarbeiter1.t11     -INF      1.000     1.000      .         
+Mitarbeiter1.t12     -INF      1.000     1.000      .         
+Mitarbeiter1.t13     -INF      1.000     1.000      .         
+Mitarbeiter1.t14     -INF      1.000     1.000      .         
+Mitarbeiter1.t15     -INF       .        1.000      .         
+Mitarbeiter1.t16     -INF       .        1.000      .         
+Mitarbeiter1.t17     -INF       .        1.000      .         
+Mitarbeiter1.t18     -INF       .        1.000      .         
+Mitarbeiter1.t19     -INF       .        1.000      .         
+Mitarbeiter1.t20     -INF       .        1.000      .         
+
+---- VAR x  gleich 1 wenn Vorgang j in Periode t beendet wird und 0 sonst
+
+          LOWER     LEVEL     UPPER    MARGINAL
+
+Q .t0       .        1.000     1.000      EPS       
+Q .t1       .         .        1.000      EPS       
+A1.t0       .         .        1.000      EPS       
+A1.t1       .         .        1.000      EPS       
+A1.t2       .         .        1.000      EPS       
+A1.t3       .         .        1.000      EPS       
+A1.t4       .         .        1.000      EPS       
+A1.t5       .         .        1.000      EPS       
+A1.t6       .         .        1.000      EPS       
+A1.t7       .         .        1.000      EPS       
+A1.t8       .         .        1.000      EPS       
+A1.t9       .        1.000     1.000      EPS       
+A1.t10      .         .        1.000      EPS       
+A1.t11      .         .        1.000      EPS       
+A1.t12      .         .        1.000      EPS       
+A1.t13      .         .        1.000      EPS       
+A1.t14      .         .        1.000      EPS       
+A1.t15      .         .        1.000      EPS       
+A1.t16      .         .        1.000      EPS       
+A1.t17      .         .        1.000      EPS       
+A1.t18      .         .        1.000      EPS       
+A1.t19      .         .        1.000      EPS       
+A1.t20      .         .        1.000      EPS       
+A2.t9       .        1.000     1.000      EPS       
+A2.t10      .         .        1.000      EPS       
+A3.t13      .         .        1.000      EPS       
+A3.t14      .        1.000     1.000      EPS       
+B1.t7       .        1.000     1.000      EPS       
+B1.t8       .         .        1.000      EPS       
+B1.t9       .         .        1.000      EPS       
+B2.t0       .         .        1.000      EPS       
+B2.t1       .         .        1.000      EPS       
+B2.t2       .         .        1.000      EPS       
+B2.t3       .         .        1.000      EPS       
+B2.t4       .         .        1.000      EPS       
+B2.t5       .         .        1.000      EPS       
+B2.t6       .        1.000     1.000      EPS       
+B2.t7       .         .        1.000      EPS       
+B2.t8       .         .        1.000      EPS       
+B2.t9       .         .        1.000      EPS       
+B2.t10      .         .        1.000      EPS       
+B2.t11      .         .        1.000      EPS       
+B2.t12      .         .        1.000      EPS       
+B2.t13      .         .        1.000      EPS       
+B2.t14      .         .        1.000      EPS       
+B2.t15      .         .        1.000      EPS       
+B2.t16      .         .        1.000      EPS       
+B2.t17      .         .        1.000      EPS       
+B2.t18      .         .        1.000      EPS       
+B2.t19      .         .        1.000      EPS       
+B2.t20      .         .        1.000      EPS       
+B3.t0       .         .        1.000      EPS       
+B3.t1       .         .        1.000      EPS       
+B3.t2       .         .        1.000      EPS       
+B3.t3       .         .        1.000      EPS       
+B3.t4       .         .        1.000      EPS       
+B3.t5       .         .        1.000      EPS       
+B3.t6       .         .        1.000      EPS       
+B3.t7       .         .        1.000      EPS       
+B3.t8       .         .        1.000      EPS       
+B3.t9       .         .        1.000      EPS       
+B3.t10      .         .        1.000      EPS       
+B3.t11      .         .        1.000      EPS       
+B3.t12      .         .        1.000      EPS       
+B3.t13      .         .        1.000      EPS       
+B3.t14      .        1.000     1.000      EPS       
+B3.t15      .         .        1.000      EPS       
+B3.t16      .         .        1.000      EPS       
+B3.t17      .         .        1.000      EPS       
+B3.t18      .         .        1.000      EPS       
+B3.t19      .         .        1.000      EPS       
+B3.t20      .         .        1.000      EPS       
+S .t13      .         .        1.000    13.000      
+S .t14      .        1.000     1.000    14.000      
+
+                       LOWER     LEVEL     UPPER    MARGINAL
+
+---- VAR z              -INF     14.000     +INF       .         
+
+  z  Zielfunktionswert
+
+
+**** REPORT SUMMARY :        0     NONOPT
+                             0 INFEASIBLE
+                             0  UNBOUNDED
+GAMS 24.1.3  r41464 Released Jul 26, 2013 WEX-WEI x86_64/MS Windows 03/15/14 23:50:44 Page 6
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+E x e c u t i o n
+
+
+----    125 VARIABLE x.L  gleich 1 wenn Vorgang j in Periode t beendet wird und 
+                          0 sonst
+
+            t0          t6          t7          t9         t14
+
+Q        1.000
+A1                                           1.000
+A2                                           1.000
+A3                                                       1.000
+B1                               1.000
+B2                   1.000
+B3                                                       1.000
+S                                                        1.000
+
+
+
+EXECUTION TIME       =        0.000 SECONDS      3 MB  24.1.3 r41464 WEX-WEI
+
+
+USER: Kurslizenz                                     S130222/0001AN-GEN
+      Leibniz University Hannover, Lehrstuhl fuer ProduktionswirtDC6657
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Users\Luise\Downloads\8_RCPSP.gms
+Output     C:\Sites\RCPSP_App\8_RCPSP.lst

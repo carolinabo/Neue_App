@@ -1,0 +1,17 @@
+<!--<p id="notice"><%= notice %></p> -->
+<p>
+  <b>Job:</b>
+  <%= @consumption.job.name %>
+</p>
+
+<p>
+  <b>Ressource:</b>
+  <%= @consumption.resource.name %>
+</p>
+<p>
+  <b>Consumption:</b>
+  <%= @consumption.consumption %>
+</p>
+
+<%= link_to 'Update', edit_consumption_path(@consumption) %> <br><br>
+<%= link_to 'Back', consumptions_path %>

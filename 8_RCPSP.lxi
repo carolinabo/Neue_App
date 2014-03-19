@@ -1,0 +1,19 @@
+B 2 C o m p i l a t i o n
+B 141 Equation Listing    SOLVE RCPSP Using MIP From line 124
+D 142 Zielfunktion
+D 148 JederVorgangEinmal
+D 161 Projektstruktur
+D 174 Kapazitaetsrestriktion
+B 199 Column Listing      SOLVE RCPSP Using MIP From line 124
+E 200 x
+E 221 z
+B 230 Model Statistics    SOLVE RCPSP Using MIP From line 124
+B 246 Solution Report     SOLVE RCPSP Using MIP From line 124
+F 283 Zielfunktion
+F 289 JederVorgangEinmal
+F 302 Projektstruktur
+F 317 Kapazitaetsrestriktion
+G 338 x
+G 417 z
+B 430 E x e c u t i o n
+I 431 x

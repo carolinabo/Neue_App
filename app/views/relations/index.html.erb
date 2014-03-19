@@ -1,0 +1,34 @@
+<h1>Relations</h1>
+<table class="table" id="relation">
+  <tr>
+    <th>Job</th>
+    <th>Successor</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+  <% @relations.each do |relation| %>
+      <tr>
+        <td><%= relation.job.name %></td>
+        <td><%= relation.successor.name %></td>
+        <td><%= link_to 'Show', relation %></td>
+        <td><%= link_to 'Update', edit_relation_path(relation) %></td>
+        <td><%= link_to 'Destroy', relation, method: :delete, data: {confirm: 'Are you sure?'} %></td>
+      </tr>
+  <% end %>
+</table>
+
+<br/>
+
+<%= link_to 'Create a new Relation', new_relation_path %><br> <br>
+
+<div class="navigation-left" style="float:left">
+  &lArr;  <%= link_to 'Go Back to Jobs', jobs_path %>  </div>
+<div class="navigation-left" style="float:right">
+  <%= link_to 'Continue with Consumptions', consumptions_path %>     &#8658;    </div>
+<br>
+<div class="navigation-left" style="float:left">
+  &lArr; <%= link_to  'Go to Main menu', current_user %>    </div><br>
+<div class="nagigation-left" style="float:left">
+  &lArr; <%= link_to  'Go to Update menu', current_user %>    </div>

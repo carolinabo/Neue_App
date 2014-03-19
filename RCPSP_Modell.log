@@ -1,0 +1,31 @@
+
+--- Job RCPSP_Modell.gms Start 03/17/14 20:26:57 24.2.1 r43572 WEX-WEI x86_64/MS Windows
+GAMS 24.2.1   Copyright (C) 1987-2013 GAMS Development. All rights reserved
+Licensee: Kurslizenz                                     S130222/0001AN-GEN
+          Leibniz University Hannover, Lehrstuhl fuer ProduktionswirtDC6657
+          License for teaching and research at degree granting institutions
+--- Starting compilation
+--- RCPSP_Modell.gms(26) 2 Mb
+--- .inputfile.inc(85) 3 Mb
+--- RCPSP_Modell.gms(56) 3 Mb 1 Error
+*** Error 141 in C:\Sites\Last_App\RCPSP_Modell.gms
+    Symbol neither initialized nor assigned
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- RCPSP_Modell.gms(58) 3 Mb 2 Errors
+*** Error 257 in C:\Sites\Last_App\RCPSP_Modell.gms
+    Solve statement not checked because of previous errors
+--- RCPSP_Modell.gms(60) 3 Mb 3 Errors
+*** Error 141 in C:\Sites\Last_App\RCPSP_Modell.gms
+    Symbol neither initialized nor assigned
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- RCPSP_Modell.gms(70) 3 Mb 4 Errors
+*** Error 141 in C:\Sites\Last_App\RCPSP_Modell.gms
+    Symbol neither initialized nor assigned
+       A wild shot: You may have spurious commas in the explanatory
+       text of a declaration. Check symbol reference list.
+--- RCPSP_Modell.gms(81) 3 Mb 4 Errors
+*** Status: Compilation error(s)
+--- Job RCPSP_Modell.gms Stop 03/17/14 20:26:57 elapsed 0:00:00.395
+Exit code = 2

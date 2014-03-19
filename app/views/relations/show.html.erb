@@ -1,0 +1,13 @@
+<!--<p id="notice"><%= notice %></p> -->
+<p>
+  <b>Job:</b>
+  <%= @relation.job.name %>
+</p>
+
+<p>
+  <b>Successor:</b>
+  <%= @relation.successor.name %>
+</p>
+
+<%= link_to 'Update', edit_relation_path(@relation) %> <br><br>
+<%= link_to 'Back', relations_path %>

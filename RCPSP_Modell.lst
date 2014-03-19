@@ -1,0 +1,221 @@
+GAMS 24.2.1  r43572 Released Dec  9, 2013 WEX-WEI x86_64/MS Windows 03/17/14 20:26:57 Page 1
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+C o m p i l a t i o n
+
+
+   1  set
+   2    j Arbeitsgang
+   3    t Periode
+   4    r Ressource;
+   5   
+   6  alias(t,q);
+   7  alias(h,j);
+   8   
+   9  set
+  10    VN(h,j) Vorgänger-Nachfolger-Relation zwischen h und j;
+  11   
+  12  parameter
+  13    d(j)    Dauer des Arbeitsgangs j
+  14    FEZ(j)  fruehestmoeglicher Endtermin des Arbeitsgangs j
+  15    k(j,r)  Kapazitaetsbedarf des Arbeitsgangs j bezueglich der Ressource r 
+      je Periode
+  16    Kap(r)  Periodenkapazitaet der Ressource r
+  17    SEZ(j)  spaetestzulaessiger Endtermin des Arbeitsgangs j   ;
+  18   
+  19  binary variables
+  20   
+  21    x(j,t)  nimmt den Wert 1 an wenn der Arbeitsgang j in Periode t beendet 
+      wird und 0 sonst;
+  22   
+  23  free variables
+  24    z       Zielfunktionswert;
+  25   
+INCLUDE    C:\Sites\Neu_App\inputfile.inc
+  27  set r /
+  28  r1
+  29  /;
+  30   
+  31  set j /
+  32  Q
+  33  j1
+  34  j2
+  35  j3
+  36  j4
+  37  j5
+  38  j6
+  39  j7
+  40  j8
+  41  j9
+  42  j10
+  43  S
+  44  /;
+  45   
+  46  set t /t0*t50/;
+  47   
+  48  VN(h,j)=no;
+  49  VN('Q','j1')=yes;
+  50  VN('j1','S')=yes;
+  51  VN('Q','j2')=yes;
+  52  VN('j2','S')=yes;
+  53  VN('Q','j3')=yes;
+  54  VN('j3','S')=yes;
+  55  VN('Q','j4')=yes;
+  56  VN('j4','S')=yes;
+  57  VN('Q','j5')=yes;
+  58  VN('j5','S')=yes;
+  59  VN('Q','j6')=yes;
+  60  VN('j6','S')=yes;
+  61  VN('Q','j7')=yes;
+  62  VN('j7','S')=yes;
+  63  VN('Q','j8')=yes;
+  64  VN('j8','S')=yes;
+  65  VN('Q','j9')=yes;
+  66  VN('j9','S')=yes;
+  67  VN('Q','j10')=yes;
+  68  VN('j10','S')=yes;
+  69   
+  70  VN('j1','j2')=yes;
+  71  VN('j2','j3')=yes;
+  72  VN('j2','j4')=yes;
+  73  VN('j3','j5')=yes;
+  74  VN('j3','j6')=yes;
+  75  VN('j4','j8')=yes;
+  76  VN('j5','j9')=yes;
+  77  VN('j6','j7')=yes;
+  78  VN('j7','j8')=yes;
+  79  VN('j8','j9')=yes;
+  80  VN('j9','j10')=yes;
+  81   
+  82  parameter
+  83  d(j) /
+  84  Q   0
+  85  S   0
+  86  j1   1
+  87  j2   2
+  88  j3   3
+  89  j4   2
+  90  j5   3
+  91  j6   4
+  92  j7   6
+  93  j8   8
+  94  j9   3
+  95  j10   15
+  96  /
+  97  Kap(r) /
+  98  r1   9
+  99  /;
+ 100   
+ 101  k(j,r)=0;
+ 102  k('j1','r1')=8;
+ 103  k('j2','r1')=8;
+ 104  k('j3','r1')=5;
+ 105  k('j4','r1')=4;
+ 106  k('j5','r1')=4;
+ 107  k('j6','r1')=8;
+ 108  k('j7','r1')=7;
+ 109  k('j8','r1')=6;
+ 110  k('j9','r1')=5;
+ 111  k('j10','r1')=8;
+ 112   
+ 113   
+ 114  Equations
+ 115      Zielfunktion
+ 116      JederVorgangEinmal(j)
+ 117      Projektstruktur(h,j)
+ 118      Kapazitaetsrestriktion(r,t);
+ 119   
+ 120  Zielfunktion..
+ 121      z=e=sum(j$(ord(j)=card(J)),sum(t$(FEZ(j)<=ord(t)-1 and ord(t)-1 <= SEZ
+      (j)), (ord(t)-1)*x(j,t)));
+ 122   
+ 123  JederVorgangEinmal(j)..
+ 124      sum(t$(FEZ(j)<=ord(t)-1 and ord(t)-1 <= SEZ(j)), x(j,t)) =e= 1;
+ 125   
+ 126  Projektstruktur(h,j)$VN(h,j)..
+ 127      sum(t$(FEZ(h)<=ord(t)-1 and ord(t)-1 <= SEZ(h)), (ord(t)-1)*x(h,t))  =
+      l=
+ 128      sum(t$(FEZ(j)<=ord(t)-1 and ord(t)-1 <= SEZ(j)), (ord(t)-1-d(j))*x(j,t
+      ));
+ 129   
+ 130  Kapazitaetsrestriktion(r,t)..
+ 131      sum(j,k(j,r)*sum(q$(ord(q)-1>=ord(t)-1 and ord(q)-1<=ord(t)-1+d(j)-1),
+      x(j,q)))=l=Kap(r);
+ 132   
+ 133  model RCPSP /
+ 134      Zielfunktion
+ 135      JederVorgangEinmal
+ 136      Projektstruktur
+ 137      Kapazitaetsrestriktion
+ 138      /;
+ 139   
+ 140  *Liefertermin muss verschoben werden, sonst keine zulaessige Loesung
+ 141  SEZ(j)=SEZ(j)+1;
+****           $141
+**** LINE     56 INPUT       C:\Sites\Last_App\RCPSP_Modell.gms
+ 142   
+ 143  solve RCPSP minimizing z using mip;
+****                                    $257
+**** LINE     58 INPUT       C:\Sites\Last_App\RCPSP_Modell.gms
+ 144   
+ 145  display x.l
+****            $141
+**** LINE     60 INPUT       C:\Sites\Last_App\RCPSP_Modell.gms
+ 146   
+ 147  loop(t,
+ 148   x.l('Q',t)=0;
+ 149   x.l('S',t)=0;
+ 150  );
+ 151   
+ 152  file Outputfile / 'Outputfile.txt'/;
+ 153  put Outputfile;
+ 154   
+ 155  put 'Zielfunktionswert:  ',z.l /
+****                               $141
+**** LINE     70 INPUT       C:\Sites\Last_App\RCPSP_Modell.gms
+ 156   
+ 157  loop(j,
+ 158       loop(t,
+ 159           if(x.l(j,t)=1,
+ 160               put j.tl:0, ' ; ' ord(t):0 /
+ 161           );
+ 162       );
+ 163  );
+ 164   
+ 165  putclose outputfile;
+ 166   
+GAMS 24.2.1  r43572 Released Dec  9, 2013 WEX-WEI x86_64/MS Windows 03/17/14 20:26:57 Page 2
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Error Messages
+
+
+141  Symbol neither initialized nor assigned
+        A wild shot: You may have spurious commas in the explanatory
+        text of a declaration. Check symbol reference list.
+257  Solve statement not checked because of previous errors
+
+**** 4 ERROR(S)   0 WARNING(S)
+GAMS 24.2.1  r43572 Released Dec  9, 2013 WEX-WEI x86_64/MS Windows 03/17/14 20:26:57 Page 3
+G e n e r a l   A l g e b r a i c   M o d e l i n g   S y s t e m
+Include File Summary
+
+
+   SEQ   GLOBAL TYPE      PARENT   LOCAL  FILENAME
+
+     1        1 INPUT          0       0  C:\Sites\Last_App\RCPSP_Modell.gms
+     2       26 INCLUDE        1      26  .C:\Sites\Neu_App\inputfile.inc
+
+
+COMPILATION TIME     =        0.328 SECONDS      3 MB  24.2.1 r43572 WEX-WEI
+
+
+USER: Kurslizenz                                     S130222/0001AN-GEN
+      Leibniz University Hannover, Lehrstuhl fuer ProduktionswirtDC6657
+      License for teaching and research at degree granting institutions
+
+
+**** FILE SUMMARY
+
+Input      C:\Sites\Last_App\RCPSP_Modell.gms
+Output     C:\Sites\Neu_App\RCPSP_Modell.lst
+
+**** USER ERROR(S) ENCOUNTERED

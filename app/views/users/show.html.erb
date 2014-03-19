@@ -1,0 +1,24 @@
+<% provide(:title, @user.name) %>
+<div class="row">
+  <aside class="span4">
+    <section>
+      <h1>
+        <%= gravatar_for  @user %>
+        <%= @user.name %>
+      </h1>
+    </section>
+  </aside>
+</div>
+
+<% if signed_in? %>
+
+    <p >
+      <%= button_to "Update Project", :controller => 'users', :action => 'update_project' %>
+      <%= button_to "New Project", :controller => 'resources', :action => 'new_project' %>
+      <%= button_to "Load Sample Project", :controller => 'jobs', :action => 'load_project' %>
+      <%= button_to "Calculate FEZ and SEZ", :controller => 'jobs', :action => 'calc_fezsez' %>
+      <%= button_to "Delete Solution", :controller => 'jobs', :action => 'delete_solution' %>
+      <%= button_to "Solve Problem", :controller => 'jobs', :action => 'solve_problem' %>
+      <%= button_to "Read Solution", :controller => 'jobs', :action =>  'read_solution'%>
+    </p>
+<% end %>

@@ -1,0 +1,13 @@
+<!--<p id="notice"><%= notice %></p> -->
+<p>
+  <b>Name:</b>
+  <%= @resource.name %>
+</p>
+
+<p>
+  <b>Code:</b>
+  <%= @resource.capacity %>
+</p>
+
+<%= link_to 'Update', edit_resource_path(@resource) %> <br><br>
+<%= link_to 'Back', resources_path %>

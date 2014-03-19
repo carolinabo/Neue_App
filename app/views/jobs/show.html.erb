@@ -1,0 +1,32 @@
+<!--<p id="notice"><%= notice %></p> -->
+<p>
+  <b>Name:</b>
+  <%= @job.name %>
+</p>
+
+<p>
+  <b>Duration:</b>
+  <%= @job.duration %>
+</p>
+<p>
+  <b>FEZ:</b>
+  <%= @job.fez %>
+</p>
+
+<p>
+  <b>SEZ:</b>
+  <%= @job.sez %>
+</p>
+
+<p>
+  <b>Begin:</b>
+  <%= @job.begin %>
+</p>
+
+<p>
+  <b>End:</b>
+  <%= @job.end %>
+</p>
+
+<%= link_to 'Update', edit_job_path(@job) %> <br><br>
+<%= link_to 'Back', jobs_path %>
