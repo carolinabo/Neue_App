@@ -11,10 +11,10 @@ describe Resource do
 
   it { should be_valid }
 
-  #it "capacity is positive" do
-  #  resource = Resource.new
-  #  resource.capacity.should > 0
-  #end
+  it "capacity is positive" do
+    resource = Resource.new
+    resource.capacity.should > 0
+  end
 
   describe "when name is not present" do
     before { @resource.name = " " }
@@ -38,7 +38,5 @@ describe Resource do
     end
     it { should_not be_valid }
   end
-
-
 
 end
